@@ -48,6 +48,11 @@ module.exports.deleteCard = (req, res) => {
         .send({ message: 'Карточка с указанным _id не найдена.' });
     })
     .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(HTTP_ERRORS.ERROR_DATA)
+          .send({ message: 'Некореетно переданный _id карточки' });
+        return;
+      }
       res.status(HTTP_ERRORS.ERROR_SERVER)
         .send({ message: `Произошла ошибка на сервере: ${err.message}` });
     });
@@ -72,6 +77,11 @@ module.exports.likeCard = (req, res) => {
         .send({ message: 'Передан несуществующий _id карточки.' });
     })
     .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(HTTP_ERRORS.ERROR_DATA)
+          .send({ message: 'Некореетно переданный _id карточки' });
+        return;
+      }
       res.status(HTTP_ERRORS.ERROR_SERVER)
         .send({ message: `Произошла ошибка на сервере: ${err.message}` });
     });
@@ -96,6 +106,11 @@ module.exports.dislikeCard = (req, res) => {
         .send({ message: 'Передан несуществующий _id карточки.' });
     })
     .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(HTTP_ERRORS.ERROR_DATA)
+          .send({ message: 'Некореетно переданный _id карточки' });
+        return;
+      }
       res.status(HTTP_ERRORS.ERROR_SERVER)
         .send({ message: `Произошла ошибка на сервере: ${err.message}` });
     });
