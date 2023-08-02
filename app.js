@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const usersRouter = require('./routes/users');
-const cardsRouter = require('./routes/cards');
+const appRouter = require('./routes/index');
+const HTTP_ERRORS = require('./errors/errorCodes');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -13,8 +13,10 @@ app.use((req, res, next) => {
   };
   next();
 });
-app.use('/users', usersRouter);
-app.use('/cards', cardsRouter);
+app.use('', appRouter);
+app.use('/*', (req, res) => {
+  res.status(HTTP_ERRORS.NOT_FOUND).send({ message: 'Задан некорректный URL' });
+});
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,

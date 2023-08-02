@@ -50,7 +50,7 @@ module.exports.deleteCard = (req, res) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(HTTP_ERRORS.ERROR_DATA)
-          .send({ message: 'Некореетно переданный _id карточки' });
+          .send({ message: 'Некорректно переданный _id карточки' });
         return;
       }
       res.status(HTTP_ERRORS.ERROR_SERVER)
@@ -79,7 +79,7 @@ module.exports.likeCard = (req, res) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(HTTP_ERRORS.ERROR_DATA)
-          .send({ message: 'Некореетно переданный _id карточки' });
+          .send({ message: 'Некорректно переданный _id карточки' });
         return;
       }
       res.status(HTTP_ERRORS.ERROR_SERVER)
@@ -108,7 +108,7 @@ module.exports.dislikeCard = (req, res) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(HTTP_ERRORS.ERROR_DATA)
-          .send({ message: 'Некореетно переданный _id карточки' });
+          .send({ message: 'Некорректно переданный _id карточки' });
         return;
       }
       res.status(HTTP_ERRORS.ERROR_SERVER)

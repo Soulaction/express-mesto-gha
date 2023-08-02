@@ -26,7 +26,7 @@ module.exports.getUserById = (req, res) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(HTTP_ERRORS.ERROR_DATA)
-          .send({ message: 'Некореетно переданный _id пользователя' });
+          .send({ message: 'Некорректно переданн _id пользователя' });
         return;
       }
       res.status(HTTP_ERRORS.ERROR_SERVER)
