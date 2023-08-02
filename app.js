@@ -13,7 +13,7 @@ app.use((req, res, next) => {
   };
   next();
 });
-app.use('', appRouter);
+app.use(appRouter);
 app.use('/*', (req, res) => {
   res.status(HTTP_ERRORS.NOT_FOUND).send({ message: 'Задан некорректный URL' });
 });
