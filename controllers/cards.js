@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Cards = require('../modals/cards');
 const HTTP_ERRORS = require('../errors/errorCodes');
 
@@ -26,7 +27,7 @@ module.exports.createCard = (req, res) => {
       res.send({ data: card });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err instanceof mongoose.Error.ValidationError) {
         res.status(HTTP_ERRORS.ERROR_DATA)
           .send({ message: 'Переданы некорректные данные при создании карточки' });
         return;
@@ -48,7 +49,7 @@ module.exports.deleteCard = (req, res) => {
         .send({ message: 'Карточка с указанным _id не найдена.' });
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err instanceof mongoose.Error.CastError) {
         res.status(HTTP_ERRORS.ERROR_DATA)
           .send({ message: 'Некорректно переданный _id карточки' });
         return;
@@ -65,7 +66,6 @@ module.exports.likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     {
       new: true,
-      runValidators: true,
     },
   )
     .then((card) => {
@@ -77,7 +77,7 @@ module.exports.likeCard = (req, res) => {
         .send({ message: 'Передан несуществующий _id карточки.' });
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err instanceof mongoose.Error.CastError) {
         res.status(HTTP_ERRORS.ERROR_DATA)
           .send({ message: 'Некорректно переданный _id карточки' });
         return;
@@ -94,7 +94,6 @@ module.exports.dislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } },
     {
       new: true,
-      runValidators: true,
     },
   )
     .then((card) => {
@@ -106,7 +105,7 @@ module.exports.dislikeCard = (req, res) => {
         .send({ message: 'Передан несуществующий _id карточки.' });
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err instanceof mongoose.Error.CastError) {
         res.status(HTTP_ERRORS.ERROR_DATA)
           .send({ message: 'Некорректно переданный _id карточки' });
         return;

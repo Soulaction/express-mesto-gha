@@ -9,7 +9,7 @@ const app = express();
 app.use(express.json());
 app.use((req, res, next) => {
   req.user = {
-    _id: '64c649d7c5a3a67b02ff909d',
+    _id: '64cb6b6c4bbadc7736d65718',
   };
   next();
 });
@@ -23,5 +23,4 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server start  ${PORT}`);
 });
