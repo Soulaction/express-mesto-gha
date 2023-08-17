@@ -1,8 +1,12 @@
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
 const User = require('../modals/users');
 const HTTP_ERRORS = require('../errors/errorCodes');
+const NotFoundError = require('../errors/not-found-error');
+const ValidationError = require('../errors/validation-error');
 
-const updateUserInfo = (idUser, updateData, res) => {
+const updateUserInfo = (idUser, updateData, res, next) => {
   User.findByIdAndUpdate(idUser, updateData, {
     new: true,
     runValidators: true,
@@ -12,32 +16,43 @@ const updateUserInfo = (idUser, updateData, res) => {
         res.send({ data: user });
         return;
       }
-      res.status(HTTP_ERRORS.NOT_FOUND)
-        .send({ message: 'Пользователь по указанному _id не найден' });
+      throw new NotFoundError('Пользователь по указанному _id не найден');
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
-        res.status(HTTP_ERRORS.ERROR_DATA)
-          .send({ message: 'Переданы некорректные данные при создании пользователя' });
+        next(new ValidationError('Переданы некорректные данные при создании пользователя'));
         return;
       }
-      res.status(HTTP_ERRORS.ERROR_SERVER)
-        .send({ message: `Произошла ошибка на сервере: ${err.message}` });
+      next(err);
     });
 };
 
-module.exports.getUsers = (req, res) => {
+module.exports.login = (req, res, next) => {
+  const {
+    email,
+    password,
+  } = req.body;
+  User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+      res.cookie('token', `Bearer ${token}`, {
+        maxAge: 3600000 * 24 * 7,
+        httpOnly: true,
+      });
+      res.send({ message: 'Вы авторизованы' });
+    })
+    .catch(next);
+};
+
+module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => {
       res.send({ data: users });
     })
-    .catch((err) => {
-      res.status(HTTP_ERRORS.ERROR_SERVER)
-        .send({ message: `Произошла ошибка на сервере: ${err.message}` });
-    });
+    .catch(next);
 };
 
-module.exports.getUserById = (req, res) => {
+module.exports.getUserById = (req, res, next) => {
   const { userId } = req.params;
   User.findById(userId)
     .then((user) => {
@@ -45,54 +60,76 @@ module.exports.getUserById = (req, res) => {
         res.send({ data: user });
         return;
       }
-      res.status(HTTP_ERRORS.NOT_FOUND)
-        .send({ message: 'Пользователь по указанному _id не найден' });
+      throw new NotFoundError('Пользователь по указанному _id не найден');
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        res.status(HTTP_ERRORS.ERROR_DATA)
-          .send({ message: 'Некорректно переданн _id пользователя' });
+        next(new ValidationError('Некорректно переданн _id пользователя'));
         return;
       }
-      res.status(HTTP_ERRORS.ERROR_SERVER)
-        .send({ message: `Произошла ошибка на сервере: ${err.message}` });
+      next(err);
     });
 };
 
-module.exports.createUser = (req, res) => {
+module.exports.getUserInfo = (req, res) => {
+  console.log(req.user._id);
+  User.findById(req.user._id)
+    .then((user) => {
+      if (user) {
+        res.send({ data: user });
+        return;
+      }
+      throw new NotFoundError('Пользователь по указанному _id не найден');
+    })
+    .catch((err) => {
+      if (err instanceof mongoose.Error.CastError) {
+        next(new ValidationError('Некорректно переданн _id пользователя'));
+        return;
+      }
+      next(err);
+    });
+};
+
+module.exports.createUser = (req, res, next) => {
   const {
     name,
+    email,
+    password,
     about,
     avatar,
   } = req.body;
-  User.create({
-    name,
-    about,
-    avatar,
-  })
+  bcrypt.hash(password, 10)
+    .then((hash) => User.create({
+      name,
+      email,
+      password: hash,
+      about,
+      avatar,
+    }))
     .then((user) => {
       res.send({ data: user });
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
-        res.status(HTTP_ERRORS.ERROR_DATA)
-          .send({ message: 'Переданы некорректные данные при создании пользователя' });
+        next(new ValidationError('Переданы некорректные данные при создании пользователя'));
         return;
       }
-      res.status(HTTP_ERRORS.ERROR_SERVER)
-        .send({ message: `Произошла ошибка на сервере: ${err.message}` });
+      next(err);
     });
 };
 
-module.exports.updateProfileUser = (req, res) => {
+module.exports.updateProfileUser = (req, res, next) => {
   const {
     name,
     about,
   } = req.body;
-  updateUserInfo(req.user._id, { name, about }, res);
+  updateUserInfo(req.user._id, {
+    name,
+    about,
+  }, res, next);
 };
 
-module.exports.updateAvatarUser = (req, res) => {
+module.exports.updateAvatarUser = (req, res, next) => {
   const { avatar } = req.body;
-  updateUserInfo(req.user._id, { avatar }, res);
+  updateUserInfo(req.user._id, { avatar }, res, next);
 };

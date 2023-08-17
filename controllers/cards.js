@@ -1,19 +1,19 @@
 const mongoose = require('mongoose');
 const Cards = require('../modals/cards');
 const HTTP_ERRORS = require('../errors/errorCodes');
+const ValidationError = require('../errors/validation-error');
+const NotFoundError = require('../errors/not-found-error');
+const ForbiddenError = require('../errors/forbidden-error');
 
-module.exports.getCards = (req, res) => {
+module.exports.getCards = (req, res, next) => {
   Cards.find({})
     .then((cards) => {
       res.send({ data: cards });
     })
-    .catch((err) => {
-      res.status(HTTP_ERRORS.ERROR_SERVER)
-        .send({ message: `Произошла ошибка на сервере: ${err.message}` });
-    });
+    .catch(next);
 };
 
-module.exports.createCard = (req, res) => {
+module.exports.createCard = (req, res, next) => {
   const {
     name,
     link,
@@ -28,38 +28,38 @@ module.exports.createCard = (req, res) => {
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
-        res.status(HTTP_ERRORS.ERROR_DATA)
-          .send({ message: 'Переданы некорректные данные при создании карточки' });
+        next(new ValidationError('Переданы некорректные данные при создании карточки'));
         return;
       }
-      res.status(HTTP_ERRORS.ERROR_SERVER)
-        .send({ message: `Произошла ошибка на сервере: ${err.message}` });
+      next(err);
     });
 };
 
-module.exports.deleteCard = (req, res) => {
+module.exports.deleteCard = (req, res, next) => {
   const { cardId } = req.params;
-  Cards.findByIdAndRemove(cardId)
+  Cards.findById(cardId)
     .then((card) => {
-      if (card) {
-        res.send({ data: card });
-        return;
+      if (!card) {
+        throw new NotFoundError('Карточка с указанным _id не найдена');
+      } else if (card.owner.toString() !== req.user._id) {
+        throw new ForbiddenError('У вас недостаточно прав на удаление карточки');
+      } else {
+        Cards.findByIdAndRemove(cardId)
+          .then((removeCard) => {
+            res.send({ data: removeCard });
+          });
       }
-      res.status(HTTP_ERRORS.NOT_FOUND)
-        .send({ message: 'Карточка с указанным _id не найдена.' });
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        res.status(HTTP_ERRORS.ERROR_DATA)
-          .send({ message: 'Некорректно переданный _id карточки' });
+        next(new ValidationError('Некорректно переданный _id карточки'));
         return;
       }
-      res.status(HTTP_ERRORS.ERROR_SERVER)
-        .send({ message: `Произошла ошибка на сервере: ${err.message}` });
+      next(err);
     });
 };
 
-module.exports.likeCard = (req, res) => {
+module.exports.likeCard = (req, res, next) => {
   const { cardId } = req.params;
   Cards.findByIdAndUpdate(
     cardId,
@@ -73,21 +73,18 @@ module.exports.likeCard = (req, res) => {
         res.send({ data: card });
         return;
       }
-      res.status(HTTP_ERRORS.NOT_FOUND)
-        .send({ message: 'Передан несуществующий _id карточки.' });
+      throw new NotFoundError('Передан несуществующий _id карточки');
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        res.status(HTTP_ERRORS.ERROR_DATA)
-          .send({ message: 'Некорректно переданный _id карточки' });
+        next(new ValidationError('Некорректно переданный _id карточки'));
         return;
       }
-      res.status(HTTP_ERRORS.ERROR_SERVER)
-        .send({ message: `Произошла ошибка на сервере: ${err.message}` });
+      next(err);
     });
 };
 
-module.exports.dislikeCard = (req, res) => {
+module.exports.dislikeCard = (req, res, next) => {
   const { cardId } = req.params;
   Cards.findByIdAndUpdate(
     cardId,
@@ -101,16 +98,13 @@ module.exports.dislikeCard = (req, res) => {
         res.send({ data: card });
         return;
       }
-      res.status(HTTP_ERRORS.NOT_FOUND)
-        .send({ message: 'Передан несуществующий _id карточки.' });
+      throw new NotFoundError('Передан несуществующий _id карточки');
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        res.status(HTTP_ERRORS.ERROR_DATA)
-          .send({ message: 'Некорректно переданный _id карточки' });
+        next(new ValidationError('Некорректно переданный _id карточки'));
         return;
       }
-      res.status(HTTP_ERRORS.ERROR_SERVER)
-        .send({ message: `Произошла ошибка на сервере: ${err.message}` });
+      next(err);
     });
 };
