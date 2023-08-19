@@ -45,7 +45,7 @@ module.exports.deleteCard = (req, res, next) => {
       } else {
         Cards.findByIdAndRemove(cardId)
           .then((removeCard) => {
-            res.send({ data: removeCard });
+            res.statusCode(200).send({ data: removeCard });
           });
       }
     })

@@ -7,4 +7,4 @@ class ServerError extends Error {
   }
 }
 
-module.export = ServerError;
+module.exports = ServerError;
