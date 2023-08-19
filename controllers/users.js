@@ -4,6 +4,8 @@ const mongoose = require('mongoose');
 const User = require('../modals/users');
 const NotFoundError = require('../errors/not-found-error');
 const ValidationError = require('../errors/validation-error');
+const { Promise } = require('mongoose');
+const DuplicationError = require('../errors/duplication-error');
 
 const updateUserInfo = (idUser, updateData, res, next) => {
   User.findByIdAndUpdate(idUser, updateData, {
@@ -96,7 +98,13 @@ module.exports.createUser = (req, res, next) => {
     about,
     avatar,
   } = req.body;
-  bcrypt.hash(password, 10)
+  User.findOne({ email })
+    .then((user) => {
+      if (user) {
+        throw new DuplicationError('Пользователь с таким email уже создан');
+      }
+      return bcrypt.hash(password, 10);
+    })
     .then((hash) => User.create({
       name,
       email,

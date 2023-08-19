@@ -36,7 +36,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     validate: {
-      validator: (url) => /(http|https):\/\/(www.)?[-a-zA-Z0-9._~:/?#@!$&'()*,+;[]=]+#?/.test(url),
+      validator: (url) => /(http|https):\/\/(www.)?[-a-zA-Z0-9._~:/?#@!$&'()*,+;=]+#?/.test(url),
       message: 'Не верный формат url',
     },
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
@@ -47,13 +47,13 @@ userSchema.statics.findUserByCredentials = function (email, password) {
   return this.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        return Promise.reject(new AuthError('Не правильный логин, либо пароль'));
+        throw new AuthError('Не правильный логин, либо пароль');
       }
 
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            return Promise.reject(new AuthError('Не правильный логин, либо пароль'));
+            throw new AuthError('Не правильный логин, либо пароль');
           }
 
           return user;
