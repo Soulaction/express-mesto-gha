@@ -2,7 +2,6 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
 const User = require('../modals/users');
-const HTTP_ERRORS = require('../errors/errorCodes');
 const NotFoundError = require('../errors/not-found-error');
 const ValidationError = require('../errors/validation-error');
 
@@ -71,8 +70,7 @@ module.exports.getUserById = (req, res, next) => {
     });
 };
 
-module.exports.getUserInfo = (req, res) => {
-  console.log(req.user._id);
+module.exports.getUserInfo = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
       if (user) {

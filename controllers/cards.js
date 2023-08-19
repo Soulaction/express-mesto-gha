@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const Cards = require('../modals/cards');
-const HTTP_ERRORS = require('../errors/errorCodes');
 const ValidationError = require('../errors/validation-error');
 const NotFoundError = require('../errors/not-found-error');
 const ForbiddenError = require('../errors/forbidden-error');

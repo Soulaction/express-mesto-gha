@@ -1,4 +1,5 @@
 const express = require('express');
+const { errors } = require('celebrate');
 const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const appRouter = require('./routes/index');
@@ -14,7 +15,7 @@ app.use('/*', (req, res) => {
   res.status(HTTP_ERRORS.NOT_FOUND)
     .send({ message: 'Задан некорректный URL' });
 });
-
+app.use(errors());
 app.use((err, req, res, next) => {
   const {
     statusCode = 500,
