@@ -4,7 +4,6 @@ const mongoose = require('mongoose');
 const User = require('../modals/users');
 const NotFoundError = require('../errors/not-found-error');
 const ValidationError = require('../errors/validation-error');
-const { Promise } = require('mongoose');
 const DuplicationError = require('../errors/duplication-error');
 
 const updateUserInfo = (idUser, updateData, res, next) => {
