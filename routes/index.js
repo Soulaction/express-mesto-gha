@@ -13,7 +13,7 @@ const {
 
 router.use('/users', usersRouter);
 router.use('/cards', auth, cardsRouter);
-usersRouter.post('/signin', celebrate({
+router.post('/signin', celebrate({
   body: Joi.object()
     .keys({
       email: Joi.string()
@@ -23,7 +23,7 @@ usersRouter.post('/signin', celebrate({
         .required(),
     }),
 }), login);
-usersRouter.post('/signup', celebrate({
+router.post('/signup', celebrate({
   body: Joi.object()
     .keys({
       email: Joi.string()
