@@ -23,7 +23,14 @@ module.exports.createCard = (req, res, next) => {
     owner: req.user._id,
   })
     .then((card) => {
-      res.send({ data: card });
+      res.send({
+        data: {
+          name: card.name,
+          link: card.link,
+          owner: card.owner,
+          likes: card.likes,
+        },
+      });
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
@@ -45,7 +52,8 @@ module.exports.deleteCard = (req, res, next) => {
       } else {
         Cards.findByIdAndRemove(cardId)
           .then((removeCard) => {
-            res.statusCode(200).send({ data: removeCard });
+            res.status(200)
+              .send({ data: removeCard });
           });
       }
     })

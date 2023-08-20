@@ -16,7 +16,14 @@ const {
 
 usersRouter.get('/me', auth, getUserInfo);
 usersRouter.get('/', auth, getUsers);
-usersRouter.get('/:userId', auth, getUserById);
+usersRouter.get('/:userId', auth, celebrate({
+  params: Joi.object()
+    .keys({
+      cardId: Joi.string()
+        .required()
+        .length(24),
+    }),
+}), getUserById);
 usersRouter.patch('/me', auth, celebrate({
   body: Joi.object()
     .keys({
