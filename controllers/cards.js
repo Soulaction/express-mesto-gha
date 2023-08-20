@@ -25,6 +25,7 @@ module.exports.createCard = (req, res, next) => {
     .then((card) => {
       res.send({
         data: {
+          _id: card._id,
           name: card.name,
           link: card.link,
           owner: card.owner,

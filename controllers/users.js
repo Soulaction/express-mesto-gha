@@ -63,7 +63,7 @@ module.exports.getUserById = (req, res, next) => {
             name: user.name,
             about: user.about,
             avatar: user.avatar,
-          }
+          },
         });
         return;
       }
