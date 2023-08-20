@@ -19,7 +19,7 @@ usersRouter.get('/', auth, getUsers);
 usersRouter.get('/:userId', auth, celebrate({
   params: Joi.object()
     .keys({
-      cardId: Joi.string()
+      userId: Joi.string()
         .required()
         .length(24),
     }),
