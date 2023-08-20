@@ -20,7 +20,7 @@ app.use('/*', (req, res) => {
     .send({ message: 'Задан некорректный URL' });
 });
 app.use(errors());
-app.use(handlerError());
+app.use(handlerError);
 
 app.listen(PORT, () => {
 });
