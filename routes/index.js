@@ -10,9 +10,13 @@ const {
   login,
   createUser,
 } = require('../controllers/users');
+const NotFoundError = require('../errors/not-found-error');
 
 router.use('/users', usersRouter);
 router.use('/cards', auth, cardsRouter);
+router.get('/signout', (req, res) => {
+  res.clearCookie('token').send({ message: 'Выход' });
+});
 router.post('/signin', celebrate({
   body: Joi.object()
     .keys({
@@ -38,8 +42,11 @@ router.post('/signup', celebrate({
         .min(2)
         .max(30),
       avatar: Joi.string()
-        .pattern(/(http|https):\/\/(www.)?[-a-zA-Z0-9._~:/?#@!$&'()*,+;=]+#?/),
+        .pattern(/https?:\/\/(www.)?[-a-zA-Z0-9_~:/?#@!$&'()*,+;=]+\.[-a-zA-Z0-9_~:/?#@!$&'()*,+;=]+#?/),
     }),
 }), createUser);
+router.use('/*', auth, (req, res, next) => {
+  next(new NotFoundError('Задан некорректный URL'));
+});
 
 module.exports = router;

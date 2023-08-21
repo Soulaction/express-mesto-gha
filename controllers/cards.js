@@ -55,7 +55,7 @@ module.exports.deleteCard = (req, res, next) => {
           .then((removeCard) => {
             res.status(200)
               .send({ data: removeCard });
-          });
+          }).catch(next);
       }
     })
     .catch((err) => {

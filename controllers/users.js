@@ -35,7 +35,7 @@ module.exports.login = (req, res, next) => {
   User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
-      res.cookie('token', `Bearer ${token}`, {
+      res.cookie('token', token, {
         maxAge: 3600000 * 24 * 7,
         httpOnly: true,
       });
@@ -104,13 +104,7 @@ module.exports.createUser = (req, res, next) => {
     about,
     avatar,
   } = req.body;
-  User.findOne({ email })
-    .then((user) => {
-      if (user) {
-        throw new DuplicationError('Пользователь с таким email уже создан');
-      }
-      return bcrypt.hash(password, 10);
-    })
+  bcrypt.hash(password, 10)
     .then((hash) => User.create({
       name,
       email,
@@ -131,9 +125,11 @@ module.exports.createUser = (req, res, next) => {
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
         next(new ValidationError('Переданы некорректные данные при создании пользователя'));
-        return;
+      } else if (err.code === 11000) {
+        next(new DuplicationError('Пользователь с таким email уже создан'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 

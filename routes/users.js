@@ -42,7 +42,7 @@ usersRouter.patch('/me/avatar', auth, celebrate({
     .keys({
       avatar: Joi.string()
         .required()
-        .pattern(/(http|https):\/\/(www.)?[-a-zA-Z0-9._~:/?#@!$&'()*,+;=]+#?/),
+        .pattern(/https?:\/\/(www.)?[-a-zA-Z0-9_~:/?#@!$&'()*,+;=]+\.[-a-zA-Z0-9_~:/?#@!$&'()*,+;=]+#?/),
     }),
 }), updateAvatarUser);
 
