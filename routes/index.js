@@ -12,7 +12,7 @@ const {
 } = require('../controllers/users');
 const NotFoundError = require('../errors/not-found-error');
 
-router.use('/users', usersRouter);
+router.use('/users', auth, usersRouter);
 router.use('/cards', auth, cardsRouter);
 router.get('/signout', (req, res) => {
   res.clearCookie('token').send({ message: 'Выход' });

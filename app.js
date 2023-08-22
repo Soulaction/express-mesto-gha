@@ -2,6 +2,7 @@ const express = require('express');
 const { errors } = require('celebrate');
 const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
+const helmet = require('helmet');
 const appRouter = require('./routes/index');
 const handlerError = require('./middlewares/handler-errors');
 
@@ -11,6 +12,7 @@ const app = express();
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
 });
+app.use(helmet());
 app.use(express.json());
 app.use(cookieParser());
 app.use(appRouter);
