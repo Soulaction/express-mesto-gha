@@ -16,7 +16,7 @@ cardsRouter.get('/', getCards);
 cardsRouter.post('/', celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
-    link: Joi.string().required().pattern(/https?:\/\/(www.)?[-a-zA-Z0-9_~:/?#@!$&'()*,+;=]+\.[-a-zA-Z0-9_~:/?#@!$&'()*,+;=]+#?/),
+    link: Joi.string().required().pattern(/https?:\/\/(www.)?[-a-zA-Z0-9_~:/?#@!$&'()*,.+;=]+\.[-a-zA-Z0-9_~:/?#@!$&'()*,+;=]+#?/),
   }),
 }), createCard);
 cardsRouter.delete('/:cardId', celebrate({

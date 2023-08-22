@@ -42,7 +42,7 @@ router.post('/signup', celebrate({
         .min(2)
         .max(30),
       avatar: Joi.string()
-        .pattern(/https?:\/\/(www.)?[-a-zA-Z0-9_~:/?#@!$&'()*,+;=]+\.[-a-zA-Z0-9_~:/?#@!$&'()*,+;=]+#?/),
+        .pattern(/https?:\/\/(www.)?[-a-zA-Z0-9_~:/?#@!$&'()*,.+;=]+\.[-a-zA-Z0-9_~:/?#@!$&'()*,+;=]+#?/),
     }),
 }), createUser);
 router.use('/*', auth, (req, res, next) => {

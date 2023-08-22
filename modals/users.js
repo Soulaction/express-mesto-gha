@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema({
   avatar: {
     type: String,
     validate: {
-      validator: (url) => /https?:\/\/(www.)?[-a-zA-Z0-9_~:/?#@!$&'()*,+;=]+\.[-a-zA-Z0-9_~:/?#@!$&'()*,+;=]+#?/.test(url),
+      validator: (url) => /https?:\/\/(www.)?[-a-zA-Z0-9_~:/?#@!$&'()*,.+;=]+\.[-a-zA-Z0-9_~:/?#@!$&'()*,+;=]+#?/.test(url),
       message: 'Не верный формат url',
     },
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
